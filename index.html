@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>小白鞋 × 鞋帶配色人氣票選</title>
+<meta name="description" content="幫最喜歡的鞋帶配色投票，女生款、男生款各投 3 票！" />
+<style>
+  :root{
+    --bg:#f4f1ec;
+    --card:#ffffff;
+    --ink:#2a2724;
+    --ink-soft:#6b655e;
+    --line:#e7e1d8;
+    --female:#e07a99;      /* 女生款 粉 */
+    --female-soft:#fbe9ef;
+    --male:#4f7fb0;        /* 男生款 藍 */
+    --male-soft:#e6eef7;
+    --dark:#25211d;
+    --shadow:0 6px 22px rgba(60,50,40,.10);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:var(--bg);color:var(--ink);
+    line-height:1.55;-webkit-font-smoothing:antialiased;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  img{display:block;max-width:100%;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;}
+
+  .wrap{max-width:1040px;margin:0 auto;padding:0 16px;}
+
+  /* ---------- Header ---------- */
+  header.hero{
+    text-align:center;padding:34px 16px 22px;
+  }
+  .kicker{
+    display:inline-block;font-size:12px;letter-spacing:3px;color:var(--ink-soft);
+    border:1px solid var(--line);border-radius:999px;padding:5px 14px;background:#fff;margin-bottom:14px;
+  }
+  .hero h1{font-size:26px;margin:6px 0 8px;letter-spacing:1px;font-weight:800;}
+  .hero p{margin:0;color:var(--ink-soft);font-size:14px;}
+
+  /* ---------- Cards / shared ---------- */
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);}
+  .hidden{display:none !important;}
+
+  /* ---------- Gate (name) ---------- */
+  #gate{max-width:440px;margin:6px auto 40px;padding:26px 22px;text-align:center;}
+  #gate h2{margin:2px 0 4px;font-size:19px;}
+  #gate .sub{color:var(--ink-soft);font-size:13.5px;margin-bottom:18px;}
+  .field{text-align:left;margin-bottom:14px;}
+  .field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px;}
+  .field input{
+    width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;
+    font-size:16px;background:#fbfaf8;transition:border-color .15s;
+  }
+  .field input:focus{outline:none;border-color:var(--dark);background:#fff;}
+  .btn-primary{
+    width:100%;background:var(--dark);color:#fff;font-size:16px;font-weight:700;
+    padding:14px;border-radius:12px;transition:transform .08s, opacity .15s;
+  }
+  .btn-primary:active{transform:scale(.985);}
+  .btn-primary:disabled{opacity:.45;cursor:not-allowed;}
+  .rules{margin-top:18px;text-align:left;font-size:12.5px;color:var(--ink-soft);
+    background:#faf7f2;border:1px dashed var(--line);border-radius:12px;padding:12px 14px;}
+  .rules b{color:var(--ink);}
+
+  /* ---------- Sticky status bar ---------- */
+  #status{
+    position:sticky;top:0;z-index:20;background:rgba(244,241,236,.92);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+    padding:10px 16px;
+  }
+  #status .inner{max-width:1040px;margin:0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;}
+  .who{font-size:13px;color:var(--ink-soft);margin-right:auto;}
+  .who b{color:var(--ink);}
+  .tally{display:flex;gap:8px;}
+  .chip-count{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px;border:1.5px solid;}
+  .chip-count.f{color:var(--female);border-color:var(--female);background:var(--female-soft);}
+  .chip-count.m{color:var(--male);border-color:var(--male);background:var(--male-soft);}
+  .chip-count .n{font-variant-numeric:tabular-nums;}
+
+  /* ---------- Vote intro ---------- */
+  .vote-intro{margin:20px 0 6px;text-align:center;}
+  .vote-intro h2{margin:0 0 4px;font-size:18px;}
+  .vote-intro p{margin:0;color:var(--ink-soft);font-size:13px;}
+
+  /* ---------- Grid ---------- */
+  .grid{display:grid;gap:16px;grid-template-columns:1fr;margin:18px 0 30px;}
+  @media(min-width:560px){.grid{grid-template-columns:repeat(2,1fr);}}
+  @media(min-width:860px){.grid{grid-template-columns:repeat(3,1fr);}}
+
+  .card{overflow:hidden;display:flex;flex-direction:column;}
+  .card .imgwrap{position:relative;aspect-ratio:3/2;background:#efeae2;}
+  .card .imgwrap img{width:100%;height:100%;object-fit:cover;}
+  .card .no{position:absolute;top:10px;left:10px;background:rgba(37,33,29,.82);color:#fff;
+    font-size:12px;font-weight:700;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  .badge-type{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.92);color:var(--ink);
+    font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;}
+  .card .body{padding:12px 14px 14px;}
+  .card .name{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;}
+  .swatch{width:15px;height:15px;border-radius:50%;border:1px solid rgba(0,0,0,.12);flex:none;}
+  .card .desc{font-size:12.5px;color:var(--ink-soft);margin:3px 0 12px;min-height:34px;}
+  .vote-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .vbtn{
+    display:flex;align-items:center;justify-content:center;gap:5px;
+    padding:11px 6px;border-radius:11px;font-size:14px;font-weight:700;
+    border:1.6px solid var(--line);color:var(--ink-soft);background:#fff;transition:all .13s;
+  }
+  .vbtn .ic{font-size:15px;}
+  .vbtn.f.on{background:var(--female);border-color:var(--female);color:#fff;}
+  .vbtn.m.on{background:var(--male);border-color:var(--male);color:#fff;}
+  .vbtn.f:not(.on):active{background:var(--female-soft);}
+  .vbtn.m:not(.on):active{background:var(--male-soft);}
+  .vbtn:disabled{opacity:.38;cursor:not-allowed;}
+
+  /* ---------- Submit bar ---------- */
+  #submitbar{
+    position:sticky;bottom:0;z-index:20;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);
+    border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  }
+  #submitbar .inner{max-width:1040px;margin:0 auto;display:flex;align-items:center;gap:12px;}
+  #submitbar .sum{font-size:12.5px;color:var(--ink-soft);flex:1;}
+  #submitbar .sum b{color:var(--ink);}
+  #submitbar button{white-space:nowrap;padding:13px 22px;width:auto;}
+
+  /* ---------- Done ---------- */
+  #done{max-width:560px;margin:24px auto 50px;padding:30px 22px;text-align:center;}
+  #done .tick{width:64px;height:64px;border-radius:50%;background:#e9f5ec;color:#3a9a5a;
+    display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 14px;}
+  #done h2{margin:0 0 6px;font-size:21px;}
+  #done p{color:var(--ink-soft);font-size:14px;margin:0 0 6px;}
+  .results{margin-top:24px;text-align:left;}
+  .results h3{font-size:15px;margin:0 0 12px;text-align:center;}
+  .res-row{margin-bottom:12px;}
+  .res-head{display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:5px;}
+  .res-head .cnt{color:var(--ink-soft);font-weight:600;}
+  .bar{height:9px;border-radius:999px;background:#eee;overflow:hidden;display:flex;}
+  .bar .f{background:var(--female);height:100%;}
+  .bar .m{background:var(--male);height:100%;}
+  .legend{display:flex;gap:16px;justify-content:center;font-size:12px;color:var(--ink-soft);margin:2px 0 16px;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:10px;height:10px;border-radius:50%;}
+  .relink{display:inline-block;margin-top:14px;font-size:13px;color:var(--ink-soft);text-decoration:underline;background:none;}
+
+  .toast{
+    position:fixed;left:50%;bottom:88px;transform:translateX(-50%) translateY(20px);
+    background:var(--dark);color:#fff;font-size:13.5px;padding:11px 18px;border-radius:999px;
+    opacity:0;pointer-events:none;transition:all .25s;z-index:50;box-shadow:var(--shadow);white-space:nowrap;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .banner{max-width:1040px;margin:14px auto 0;background:#fff5e5;border:1px solid #f0d9a8;color:#8a6a1f;
+    font-size:12.5px;border-radius:12px;padding:10px 14px;text-align:center;}
+
+  footer{text-align:center;font-size:11.5px;color:#a49c90;padding:24px 16px 30px;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="kicker">電商限定色 · 人氣票選</div>
+  <h1>小白鞋 × 鞋帶配色</h1>
+  <p>選出你最想要的配色，一起決定下一波限定色！</p>
+</header>
+
+<div id="cfgBanner" class="banner hidden"></div>
+
+<!-- STEP 1: name -->
+<section id="gate" class="panel">
+  <h2>先告訴我們你是誰 👋</h2>
+  <div class="sub">投票前請輸入你的名字，方便統計。</div>
+  <div class="field">
+    <label for="name">你的名字 / 暱稱 <span style="color:var(--female)">*</span></label>
+    <input id="name" type="text" maxlength="20" placeholder="例如：王小明" autocomplete="name" />
+  </div>
+  <div class="field">
+    <label for="note">單位 / 備註（選填）</label>
+    <input id="note" type="text" maxlength="30" placeholder="例如：門市 A / 設計部" />
+  </div>
+  <button id="startBtn" class="btn-primary" disabled>開始投票</button>
+  <div class="rules">
+    📋 <b>投票規則</b><br>
+    每種配色都可以投給 <b style="color:var(--female)">女生款</b> 或 <b style="color:var(--male)">男生款</b>。<br>
+    你有 <b>女生款 3 票</b>、<b>男生款 3 票</b>，各選出最喜歡的 3 個配色。
+  </div>
+</section>
+
+<!-- STEP 2: vote -->
+<div id="vote" class="hidden">
+  <div id="status">
+    <div class="inner">
+      <div class="who">投票人：<b id="whoName">—</b></div>
+      <div class="tally">
+        <div class="chip-count f">♀ 女生款 <span class="n"><span id="fCount">0</span>/3</span></div>
+        <div class="chip-count m">♂ 男生款 <span class="n"><span id="mCount">0</span>/3</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="vote-intro">
+      <h2>為每個配色投票</h2>
+      <p>女生款、男生款各選 3 個。同一個配色兩邊都能選。</p>
+    </div>
+    <div id="grid" class="grid"></div>
+  </div>
+
+  <div id="submitbar">
+    <div class="inner">
+      <div class="sum">已選　<b><span id="fSum">0</span></b> 女生款 ·　<b><span id="mSum">0</span></b> 男生款</div>
+      <button id="submitBtn" class="btn-primary" disabled>送出投票</button>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 3: done -->
+<section id="done" class="panel hidden">
+  <div class="tick">✓</div>
+  <h2>感謝你的投票！</h2>
+  <p id="doneMsg">你的選擇已經送出 🎉</p>
+  <div id="resultsBox" class="results hidden">
+    <h3>目前即時票數</h3>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--female)"></span>女生款</span>
+      <span><span class="dot" style="background:var(--male)"></span>男生款</span>
+    </div>
+    <div id="resultsList"></div>
+  </div>
+  <button id="revote" class="relink">重新投票</button>
+</section>
+
+<div id="toast" class="toast"></div>
+
+<footer>© 電商限定色配色票選 · 由團隊內部票選使用</footer>
+
+<script>
+/* =========================================================================
+   ⚙️  設定區：把下面這行換成你的 Google Apps Script 網頁應用程式網址
+   （部署 Apps Script 後會拿到一串 https://script.google.com/macros/s/..../exec）
+   留空的話會進入「示範模式」，可以測試流程但不會寫進試算表。
+   ========================================================================= */
+const SCRIPT_URL = "";
+
+/* 投票上限：女生款 / 男生款 各幾票 */
+const MAX_VOTES = 3;
+
+/* 10 種配色資料 */
+const COLORS = [
+  { id:"coffee",  name:"摩卡棕",       type:"扁織帶",   sw:"#6b4a33", img:"images/01-coffee.jpg",  desc:"沉穩耐看的日常百搭" },
+  { id:"ivory",   name:"米白雪紗",     type:"雪紗緞帶", sw:"#efe7d6", img:"images/02-ivory.jpg",   desc:"婚紗系浪漫透膚感" },
+  { id:"mint",    name:"薄荷雪紗",     type:"雪紗緞帶", sw:"#cfe6d4", img:"images/03-mint.jpg",    desc:"清新透亮的春日感" },
+  { id:"tiffany", name:"蒂芬妮藍雪紗", type:"雪紗緞帶", sw:"#a9e0e0", img:"images/04-tiffany.jpg", desc:"高級感的夢幻蒂芬妮藍" },
+  { id:"rose",    name:"乾燥玫瑰",     type:"扁織帶",   sw:"#d59aa0", img:"images/05-rose.jpg",    desc:"溫柔復古的裸粉色" },
+  { id:"coral",   name:"蜜桃珊瑚",     type:"扁織帶",   sw:"#f6a08e", img:"images/06-coral.jpg",   desc:"甜而不膩的活力粉" },
+  { id:"oat",     name:"燕麥奶茶",     type:"扁織帶",   sw:"#c9bda6", img:"images/07-oat.jpg",     desc:"溫暖柔和的奶茶色" },
+  { id:"caramel", name:"焦糖駝",       type:"扁織帶",   sw:"#c08a4e", img:"images/08-caramel.jpg", desc:"秋冬感的知性棕" },
+  { id:"lemon",   name:"檸檬嫩芽",     type:"扁織帶",   sw:"#d7e88a", img:"images/09-lemon.jpg",   desc:"跳色亮眼的青春綠" },
+  { id:"sky",     name:"晴空藍",       type:"扁織帶",   sw:"#7fd3e8", img:"images/10-sky.jpg",     desc:"乾淨清爽的天空藍" },
+];
+
+const LS_KEY = "sneaker_vote_v1";
+
+/* 狀態 */
+const picks = { female:new Set(), male:new Set() };
+let voter = { name:"", note:"" };
+
+/* DOM helpers */
+const $ = s => document.querySelector(s);
+const demoMode = !SCRIPT_URL || SCRIPT_URL.indexOf("script.google.com") === -1;
+
+/* ---------- 初始化 ---------- */
+function init(){
+  if(demoMode){
+    const b = $("#cfgBanner");
+    b.classList.remove("hidden");
+    b.innerHTML = "🔧 目前是<b>示範模式</b>（尚未連結 Google 試算表）。可以先測試流程，設定好 SCRIPT_URL 後即會正式記錄。";
+  }
+  buildGrid();
+
+  const nameEl = $("#name");
+  nameEl.addEventListener("input", ()=>{ $("#startBtn").disabled = nameEl.value.trim().length===0; });
+  $("#startBtn").addEventListener("click", startVote);
+  $("#submitBtn").addEventListener("click", submitVote);
+  $("#revote").addEventListener("click", ()=>{ localStorage.removeItem(LS_KEY); location.reload(); });
+
+  // 若已投過票，直接顯示結果頁
+  try{
+    const saved = JSON.parse(localStorage.getItem(LS_KEY) || "null");
+    if(saved && saved.done){
+      $("#gate").classList.add("hidden");
+      showDone("你之前已經投過票了 🙌", saved.stats);
+    }
+  }catch(e){}
+}
+
+function buildGrid(){
+  const g = $("#grid");
+  g.innerHTML = COLORS.map((c,i)=>`
+    <div class="card panel" data-id="${c.id}">
+      <div class="imgwrap">
+        <img src="${c.img}" alt="${c.name}" loading="lazy" />
+        <div class="no">${i+1}</div>
+        <div class="badge-type">${c.type}</div>
+      </div>
+      <div class="body">
+        <div class="name"><span class="swatch" style="background:${c.sw}"></span>${c.name}</div>
+        <div class="desc">${c.desc}</div>
+        <div class="vote-btns">
+          <button class="vbtn f" data-cat="female" data-id="${c.id}"><span class="ic">♀</span>女生款</button>
+          <button class="vbtn m" data-cat="male" data-id="${c.id}"><span class="ic">♂</span>男生款</button>
+        </div>
+      </div>
+    </div>`).join("");
+
+  g.querySelectorAll(".vbtn").forEach(btn=>{
+    btn.addEventListener("click", ()=> toggle(btn.dataset.cat, btn.dataset.id));
+  });
+}
+
+function startVote(){
+  voter.name = $("#name").value.trim();
+  voter.note = $("#note").value.trim();
+  if(!voter.name) return;
+  $("#whoName").textContent = voter.name;
+  $("#gate").classList.add("hidden");
+  document.querySelector("header.hero").classList.add("hidden");
+  $("#vote").classList.remove("hidden");
+  window.scrollTo(0,0);
+}
+
+function toggle(cat, id){
+  const set = picks[cat];
+  if(set.has(id)){
+    set.delete(id);
+  }else{
+    if(set.size >= MAX_VOTES){
+      showToast(`${cat==="female"?"女生款":"男生款"}最多只能選 ${MAX_VOTES} 個`);
+      return;
+    }
+    set.add(id);
+  }
+  render();
+}
+
+function render(){
+  const f = picks.female.size, m = picks.male.size;
+  $("#fCount").textContent = f;
+  $("#mCount").textContent = m;
+  $("#fSum").textContent = f;
+  $("#mSum").textContent = m;
+
+  document.querySelectorAll(".vbtn").forEach(btn=>{
+    const cat = btn.dataset.cat, id = btn.dataset.id;
+    const on = picks[cat].has(id);
+    btn.classList.toggle("on", on);
+    const full = picks[cat].size >= MAX_VOTES;
+    btn.disabled = full && !on;
+  });
+
+  // 至少各投一票才可送出（可依需求改成必須投滿）
+  $("#submitBtn").disabled = (f===0 && m===0);
+}
+
+async function submitVote(){
+  if(picks.female.size===0 && picks.male.size===0){
+    showToast("請至少投一票"); return;
+  }
+  const btn = $("#submitBtn");
+  btn.disabled = true; btn.textContent = "送出中…";
+
+  const payload = {
+    name: voter.name,
+    note: voter.note,
+    female: [...picks.female],
+    male: [...picks.male],
+    femaleNames: [...picks.female].map(id=>nameOf(id)),
+    maleNames: [...picks.male].map(id=>nameOf(id)),
+    ua: navigator.userAgent,
+    ts: new Date().toISOString(),
+  };
+
+  if(demoMode){
+    await new Promise(r=>setTimeout(r,600));
+    finishOk("（示範模式）投票流程完成，正式版會寫入 Google 試算表。", null);
+    return;
+  }
+
+  try{
+    const res = await fetch(SCRIPT_URL, { method:"POST", body: JSON.stringify(payload) });
+    const data = await res.json();
+    if(data && data.ok){
+      finishOk("你的選擇已經送出 🎉", data.stats || null);
+    }else{
+      throw new Error((data && data.message) || "server error");
+    }
+  }catch(err){
+    btn.disabled = false; btn.textContent = "送出投票";
+    showToast("送出失敗，請確認網路後再試一次");
+    console.error(err);
+  }
+}
+
+function finishOk(msg, stats){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({ done:true, name:voter.name, stats:stats||null }));
+  }catch(e){}
+  $("#vote").classList.add("hidden");
+  showDone(msg, stats);
+}
+
+function showDone(msg, stats){
+  $("#done").classList.remove("hidden");
+  $("#doneMsg").textContent = msg;
+  window.scrollTo(0,0);
+  if(stats && stats.length){
+    renderResults(stats);
+  }else if(!demoMode){
+    // 沒有從送出回傳拿到統計，就主動抓一次
+    fetchResults();
+  }
+}
+
+async function fetchResults(){
+  try{
+    const res = await fetch(SCRIPT_URL, { method:"GET" });
+    const data = await res.json();
+    if(data && data.stats) renderResults(data.stats);
+  }catch(e){ /* 靜默失敗：結果仍在試算表中 */ }
+}
+
+function renderResults(stats){
+  // stats: [{id, female, male}]
+  const byId = {}; stats.forEach(s=> byId[s.id]=s);
+  let max = 1;
+  COLORS.forEach(c=>{ const s=byId[c.id]; if(s) max=Math.max(max,(s.female||0)+(s.male||0)); });
+
+  const rows = COLORS.map(c=>{
+    const s = byId[c.id] || {female:0,male:0};
+    const total = (s.female||0)+(s.male||0);
+    const fw = (s.female||0)/max*100;
+    const mw = (s.male||0)/max*100;
+    return `<div class="res-row">
+      <div class="res-head"><span><span class="swatch" style="width:11px;height:11px;display:inline-block;border-radius:50%;background:${c.sw};vertical-align:middle;margin-right:6px"></span>${c.name}</span>
+      <span class="cnt">♀${s.female||0} · ♂${s.male||0}</span></div>
+      <div class="bar"><span class="f" style="width:${fw}%"></span><span class="m" style="width:${mw}%"></span></div>
+    </div>`;
+  }).join("");
+
+  $("#resultsList").innerHTML = rows;
+  $("#resultsBox").classList.remove("hidden");
+}
+
+/* ---------- utils ---------- */
+function nameOf(id){ const c=COLORS.find(x=>x.id===id); return c?c.name:id; }
+let toastT;
+function showToast(msg){
+  const t=$("#toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),1800);
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
