@@ -311,8 +311,8 @@ function buildGrid(){
         <div class="name"><span class="swatch" style="background:${c.sw}"></span>${c.name}</div>
         <div class="desc">${c.desc}</div>
         <div class="vote-btns">
-          <button class="vbtn f" data-cat="female" data-id="${c.id}"><span class="ic">♀</span>女生款</button>
-          <button class="vbtn m" data-cat="male" data-id="${c.id}"><span class="ic">♂</span>男生款</button>
+          <button class="vbtn f" data-cat="female" data-id="${c.id}"><span class="ic">♀</span><span class="lbl">女生款・剩${MAX_VOTES}票</span></button>
+          <button class="vbtn m" data-cat="male" data-id="${c.id}"><span class="ic">♂</span><span class="lbl">男生款・剩${MAX_VOTES}票</span></button>
         </div>
       </div>
     </div>`).join("");
@@ -357,9 +357,24 @@ function render(){
   document.querySelectorAll(".vbtn").forEach(btn=>{
     const cat = btn.dataset.cat, id = btn.dataset.id;
     const on = picks[cat].has(id);
+    const remaining = MAX_VOTES - picks[cat].size;
+    const full = remaining <= 0;
     btn.classList.toggle("on", on);
-    const full = picks[cat].size >= MAX_VOTES;
     btn.disabled = full && !on;
+
+    const base = cat === "female" ? "女生款" : "男生款";
+    const ic  = btn.querySelector(".ic");
+    const lbl = btn.querySelector(".lbl");
+    if(on){                       // 這個配色已被你選為此款
+      ic.textContent  = "✓";
+      lbl.textContent = base;
+    }else if(full){               // 此款 3 票已投完
+      ic.textContent  = cat === "female" ? "♀" : "♂";
+      lbl.textContent = base + "・額滿";
+    }else{                        // 還可以投幾票
+      ic.textContent  = cat === "female" ? "♀" : "♂";
+      lbl.textContent = base + "・剩" + remaining + "票";
+    }
   });
 
   // 至少各投一票才可送出（可依需求改成必須投滿）
